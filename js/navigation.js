@@ -31,6 +31,19 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault(); // Prevent the default link behavior (page jump)
       const viewId = link.getAttribute("data-view"); // Get the target view ID
       showView(viewId); // Show the selected view
+
+      // Close the Bootstrap navbar collapse if it's open
+      const navbarCollapse = document.querySelector(".navbar-collapse");
+      if (navbarCollapse && navbarCollapse.classList.contains("show")) {
+        // Use Bootstrap's collapse method if Bootstrap JS is loaded
+        const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
+        if (bsCollapse) {
+          bsCollapse.hide();
+        } else {
+          // fallback: remove "show" class manually
+          navbarCollapse.classList.remove("show");
+        }
+      }
     });
   });
 
