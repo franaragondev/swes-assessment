@@ -1,4 +1,5 @@
 import { dummyData, dummyItemTypes } from "./data.js";
+// const API_BASE_URL = "https://my-backend.com";
 
 // Simulate GET request to fetch data
 export function fetchData() {
@@ -11,7 +12,7 @@ export function fetchData() {
   /**
    * Real implementation with fetch() (backend)
    *
-   * return fetch("https://mi-backend.com/api/reservations")
+   * return fetch(`${API_BASE_URL}/api/reservations`)
    *   .then((response) => {
    *     if (!response.ok) throw new Error("Error fetching reservations");
    *     return response.json();
@@ -30,7 +31,7 @@ export function getItemTypes() {
   /**
    * Real implementation with fetch() (backend)
    *
-   * return fetch("https://mi-backend.com/api/item-types")
+   * return fetch(`${API_BASE_URL}/api/item-types`)
    *   .then((response) => {
    *     if (!response.ok) throw new Error("Error fetching item types");
    *     return response.json();
