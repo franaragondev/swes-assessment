@@ -1,4 +1,4 @@
-import { createReservation } from "./api.js";
+import { createReservation, sendEmailNotification } from "./api.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("reservation-form");
@@ -78,13 +78,24 @@ document.addEventListener("DOMContentLoaded", () => {
       alertDiv.classList.remove("alert-info");
       alertDiv.classList.add("alert-success");
 
+      // Then, simulate sending email notification
+      try {
+        const emailResponse = await sendEmailNotification(reservationData);
+
+        // Append success message for email notification
+        alertDiv.textContent += ` ${emailResponse.message}`;
+      } catch (emailError) {
+        // Append error message for email notification failure
+        alertDiv.textContent += ` Warning: ${emailError.message}`;
+      }
+
       // Delay form reset so the user can read the success message
       setTimeout(() => {
         form.reset();
         alertDiv.classList.add("d-none");
         alertDiv.textContent = "";
         alertDiv.classList.remove("alert-success");
-      }, 2000);
+      }, 4000);
 
       // Notify other views (list/calendar) to refresh after reservation
       document.dispatchEvent(new CustomEvent("reservation-updated"));

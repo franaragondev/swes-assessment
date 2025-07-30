@@ -125,3 +125,36 @@ export async function createReservation(data) {
    * });
    */
 }
+
+/**
+ * Simulate sending an email notification (POST /api/notify)
+ * @param {Object} data - Reservation data for notification
+ * @returns {Promise<Object>} Success or error message
+ */
+export async function sendEmailNotification(data) {
+  try {
+    // Simulate network latency
+    await new Promise((resolve) => setTimeout(resolve, 700));
+
+    // Simulate success response
+    return {
+      message: `Notification email sent for reservation on ${data.reservationDate}.`,
+    };
+  } catch (error) {
+    console.error("sendEmailNotification error:", error.message);
+    throw error;
+  }
+
+  /**
+   * Real implementation example:
+   *
+   * return fetch(`${API_BASE_URL}/api/notify`, {
+   *   method: "POST",
+   *   headers: { "Content-Type": "application/json" },
+   *   body: JSON.stringify(data),
+   * }).then((res) => {
+   *   if (!res.ok) throw new Error("Email notification failed.");
+   *   return res.json();
+   * });
+   */
+}
