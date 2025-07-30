@@ -109,6 +109,7 @@
         <section id="list-view" class="view d-none">
             <h2 class="mb-4">Equipment Overview & History</h2>
             <!-- Filters -->
+
             <div class="mb-3 row g-3 align-items-center">
                 <div class="col-md-3">
                     <label for="filter-date-start" class="form-label">Start Date</label>
@@ -152,17 +153,28 @@
 
             <!-- Table -->
             <div class="table-responsive">
+                <!-- Loading Spinner -->
+                <div id="loading-spinner" class="text-center my-3 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
                 <table class="table table-striped table-hover" id="equipment-table">
                     <thead class="table-primary sticky-top">
                         <tr>
-                            <th scope="col" data-sort="date" style="cursor:pointer">Date <i
-                                    class="bi bi-arrow-down-up"></i></th>
-                            <th scope="col" data-sort="itemName" style="cursor:pointer">Item Name <i
-                                    class="bi bi-arrow-down-up"></i></th>
-                            <th scope="col" data-sort="status" style="cursor:pointer">Status <i
-                                    class="bi bi-arrow-down-up"></i></th>
-                            <th scope="col" data-sort="returnDate" style="cursor:pointer">Return Date <i
-                                    class="bi bi-arrow-down-up"></i></th>
+                            <th scope="col" data-sort="date" style="cursor:pointer">
+                                Date <i class="bi bi-arrow-down-up"></i>
+                            </th>
+                            <th scope="col" data-sort="itemName" style="cursor:pointer">
+                                Item Name <i class="bi bi-arrow-down-up"></i>
+                            </th>
+                            <th scope="col" data-sort="status" style="cursor:pointer">
+                                Status <i class="bi bi-arrow-down-up"></i>
+                            </th>
+                            <th scope="col" data-sort="returnDate" style="cursor:pointer">
+                                Return Date <i class="bi bi-arrow-down-up"></i>
+                            </th>
                             <th scope="col">Employee Name</th>
                             <th scope="col">Item ID</th>
                         </tr>

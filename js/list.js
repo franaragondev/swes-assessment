@@ -1,9 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Select table body and pagination container
+  // Select table body, pagination container and loading spinner
   const tableBody = document.getElementById("equipment-table-body");
   const pagination = document.getElementById("pagination");
+  const spinner = document.getElementById("loading-spinner");
 
-  // Select filter inputs
+  // Select filter elements
   const startDateInput = document.getElementById("filter-date-start");
   const endDateInput = document.getElementById("filter-date-end");
   const itemTypeSelect = document.getElementById("filter-item-type");
@@ -18,10 +19,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Sorting configuration
   let sortField = "date"; // Default sort column
-  let sortDirection = "asc"; // Default direction
+  let sortDirection = "asc"; // Default sort direction
 
   /**
-   * Filter data according to all the filter inputs
+   * Filter data based on filters (dates, status, type, search)
    */
   function filterData() {
     return dummyData.filter((record) => {
@@ -34,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (itemTypeSelect.value && record.itemName !== itemTypeSelect.value)
         return false;
 
-      // Status filter
+      // Status filters
       if (!statusReturned.checked && record.status === "Returned") return false;
       if (!statusPending.checked && record.status === "Pending") return false;
       if (!statusOverdue.checked && record.status === "Overdue") return false;
@@ -45,28 +46,28 @@ document.addEventListener("DOMContentLoaded", () => {
         searchTerm &&
         !record.employeeName.toLowerCase().includes(searchTerm) &&
         !record.itemId.toLowerCase().includes(searchTerm)
-      ) {
+      )
         return false;
-      }
 
       return true;
     });
   }
 
   /**
-   * Sort the filtered data by the selected column and direction
+   * Sort data based on current sort field and direction
    */
   function sortData(data) {
     return data.sort((a, b) => {
       let valA = a[sortField] || "";
       let valB = b[sortField] || "";
 
-      // Handle date fields (convert strings to Date objects)
+      // Handle date fields (convert to Date objects)
       if (sortField === "date" || sortField === "returnDate") {
         valA = valA ? new Date(valA) : new Date(0);
         valB = valB ? new Date(valB) : new Date(0);
       }
 
+      // Compare values
       if (valA < valB) return sortDirection === "asc" ? -1 : 1;
       if (valA > valB) return sortDirection === "asc" ? 1 : -1;
       return 0;
@@ -74,59 +75,71 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Render the table rows with pagination
+   * Render table rows and pagination
    */
   function renderTable() {
-    const filteredData = filterData(); // Apply filters
-    const sortedData = sortData(filteredData); // Sort data
-
-    // Get the rows for the current page
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    const paginatedData = sortedData.slice(start, end);
-
-    // Clear previous rows
+    // Show loading spinner
+    spinner.classList.remove("d-none");
     tableBody.innerHTML = "";
 
-    // If no records found, show empty message
-    if (paginatedData.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="6" class="text-center">No data found</td></tr>`;
-    } else {
-      // Create a <tr> for each record
-      paginatedData.forEach((record) => {
-        const row = document.createElement("tr");
+    // Delay for better UX simulation
+    setTimeout(() => {
+      const filteredData = filterData();
+      const sortedData = sortData(filteredData);
 
-        // Apply background color based on status
-        if (record.status === "Overdue") row.classList.add("table-danger");
-        if (record.status === "Pending") row.classList.add("table-warning");
-        if (record.status === "Returned") row.classList.add("table-success");
+      // Get data for current page
+      const start = (currentPage - 1) * rowsPerPage;
+      const end = start + rowsPerPage;
+      const paginatedData = sortedData.slice(start, end);
 
-        // Fill the row with data
-        row.innerHTML = `
-          <td>${record.date}</td>
-          <td>${record.itemName}</td>
-          <td>${record.status}</td>
-          <td>${record.returnDate || "-"}</td>
-          <td>${record.employeeName}</td>
-          <td>${record.itemId}</td>
-        `;
-        tableBody.appendChild(row);
-      });
-    }
+      // Empty state
+      if (paginatedData.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center text-muted">
+              <i class="bi bi-emoji-frown fs-4"></i> No records found
+            </td>
+          </tr>`;
+      } else {
+        // Create rows
+        paginatedData.forEach((record) => {
+          const row = document.createElement("tr");
 
-    renderPagination(filteredData.length); // Render pagination buttons
+          // Add background color based on status
+          if (record.status === "Overdue") row.classList.add("table-danger");
+          if (record.status === "Pending") row.classList.add("table-warning");
+          if (record.status === "Returned") row.classList.add("table-success");
+
+          // Fill cells with data
+          row.innerHTML = `
+            <td data-label="Date">${record.date}</td>
+            <td data-label="Item Name">${record.itemName}</td>
+            <td data-label="Status">${record.status}</td>
+            <td data-label="Return Date">${record.returnDate || "-"}</td>
+            <td data-label="Employee Name">${record.employeeName}</td>
+            <td data-label="Item ID">${record.itemId}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      }
+
+      // Render pagination
+      renderPagination(filteredData.length);
+
+      // Hide loading spinner
+      spinner.classList.add("d-none");
+    }, 400);
   }
 
   /**
-   * Render the pagination buttons
+   * Render pagination buttons (show only 3 pages + controls)
    */
   function renderPagination(totalItems) {
     const totalPages = Math.ceil(totalItems / rowsPerPage);
     pagination.innerHTML = "";
-
     if (totalPages <= 1) return;
 
-    // Helper to create page item
+    // Helper to create pagination buttons
     function createPageItem(
       page,
       text = null,
@@ -137,9 +150,12 @@ document.addEventListener("DOMContentLoaded", () => {
       li.className = `page-item${active ? " active" : ""}${
         disabled ? " disabled" : ""
       }`;
+
       const btn = document.createElement("button");
       btn.className = "page-link";
       btn.textContent = text || page;
+
+      // Add click event
       if (!disabled && !active) {
         btn.addEventListener("click", () => {
           currentPage = page;
@@ -150,41 +166,33 @@ document.addEventListener("DOMContentLoaded", () => {
       return li;
     }
 
-    // Add "First" button
+    // First & Previous buttons
     pagination.appendChild(createPageItem(1, "«", currentPage === 1));
-
-    // Add "Previous" button
     pagination.appendChild(
       createPageItem(currentPage - 1, "‹", currentPage === 1)
     );
 
-    // Calculate start and end page numbers to display (max 3)
+    // Calculate start and end page range (max 3 pages)
     let startPage = Math.max(currentPage - 1, 1);
     let endPage = Math.min(startPage + 2, totalPages);
+    if (endPage - startPage < 2) startPage = Math.max(endPage - 2, 1);
 
-    // Adjust if we are near the last page
-    if (endPage - startPage < 2) {
-      startPage = Math.max(endPage - 2, 1);
-    }
-
-    // Add page numbers
+    // Add page number buttons
     for (let i = startPage; i <= endPage; i++) {
       pagination.appendChild(createPageItem(i, null, false, i === currentPage));
     }
 
-    // Add "Next" button
+    // Next & Last buttons
     pagination.appendChild(
       createPageItem(currentPage + 1, "›", currentPage === totalPages)
     );
-
-    // Add "Last" button
     pagination.appendChild(
       createPageItem(totalPages, "»", currentPage === totalPages)
     );
   }
 
   /**
-   * Event listeners for filters
+   * Listen to filter inputs (reset to page 1)
    */
   [
     startDateInput,
@@ -196,13 +204,13 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInput,
   ].forEach((el) =>
     el.addEventListener("input", () => {
-      currentPage = 1; // Reset to page 1 when filter changes
+      currentPage = 1;
       renderTable();
     })
   );
 
   /**
-   * Event listeners for sorting (click on <th>)
+   * Listen to column headers for sorting
    */
   const headers = document.querySelectorAll(
     "#equipment-table thead th[data-sort]"
@@ -211,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
     th.addEventListener("click", () => {
       const field = th.getAttribute("data-sort");
 
-      // Toggle sort direction if the same column is clicked
+      // Toggle direction if same column is clicked
       if (sortField === field) {
         sortDirection = sortDirection === "asc" ? "desc" : "asc";
       } else {
@@ -223,22 +231,23 @@ document.addEventListener("DOMContentLoaded", () => {
       headers.forEach((el) => {
         el.classList.remove("active-sort");
         const icon = el.querySelector("i");
-        if (icon) icon.className = "bi bi-arrow-down-up"; // reset icon
+        if (icon) icon.className = "bi bi-arrow-down-up"; // Reset icon
       });
 
-      // Add active class and update icon for current column
+      // Highlight the active sorted column
       th.classList.add("active-sort");
       const icon = th.querySelector("i");
-      if (icon) {
+      if (icon)
         icon.className =
           sortDirection === "asc" ? "bi bi-arrow-up" : "bi bi-arrow-down";
-      }
 
       renderTable();
     });
   });
 
-  // Initial render and mark default sorted column
+  /**
+   * Set default sorted column
+   */
   const defaultHeader = document.querySelector(
     `#equipment-table thead th[data-sort="${sortField}"]`
   );
@@ -248,5 +257,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (icon) icon.className = "bi bi-arrow-up";
   }
 
+  // Initial table render
   renderTable();
 });
