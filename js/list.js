@@ -1,4 +1,4 @@
-import { fetchData } from "./api.js";
+import { fetchData, getItemTypes } from "./api.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   // DOM elements
@@ -26,6 +26,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // Date filters (strings in "YYYY-MM-DD" format)
   let filterStartDate = "";
   let filterEndDate = "";
+
+  // Load item types dynamically
+  getItemTypes().then((types) => {
+    itemTypeSelect.innerHTML = `<option value="">All</option>`;
+    types.forEach((type) => {
+      const option = document.createElement("option");
+      option.value = type;
+      option.textContent = type;
+      itemTypeSelect.appendChild(option);
+    });
+  });
 
   // Helper function to format a Date object to "YYYY-MM-DD" in local time
   function formatDateLocal(date) {

@@ -58,3 +58,5 @@ for (let i = 1; i <= 100; i++) {
     itemId: `${randomItem[0]}${100 + i}`,
   });
 }
+
+export const dummyItemTypes = ["Boots", "Helmet", "Vest"];
