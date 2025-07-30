@@ -63,7 +63,43 @@
         <!-- UC-R1: Create Reservation View -->
         <section id="form-view" class="view">
             <h2 class="mb-4">Create Reservation</h2>
-            <!-- Here we will add the reservation form -->
+            <form id="reservation-form" novalidate>
+                <div class="mb-3">
+                    <label for="employee-id" class="form-label">Employee ID</label>
+                    <input type="text" class="form-control" id="employee-id" name="employeeId" required
+                        placeholder="Enter Employee ID" />
+                    <div class="invalid-feedback">
+                        Please enter the employee ID.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="item-select" class="form-label">Select Item</label>
+                    <select class="form-select" id="item-select" name="item" required>
+                        <option value="" disabled selected>Select an item</option>
+                        <option value="Boots">Boots</option>
+                        <option value="Helmet">Helmet</option>
+                        <option value="Vest">Vest</option>
+                    </select>
+                    <div class="invalid-feedback">
+                        Please select an item.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="reservation-date" class="form-label">Reservation Date</label>
+                    <input type="date" class="form-control" id="reservation-date" name="reservationDate" required />
+                    <div class="invalid-feedback">
+                        Please select a valid reservation date.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Create Reservation</button>
+                <button type="reset" class="btn btn-secondary ms-2">Clear</button>
+            </form>
+
+            <!-- Alert container for success/error messages -->
+            <div id="form-alert" class="alert mt-3 d-none" role="alert"></div>
         </section>
 
         <!-- UC-R5: Equipment Overview & History -->
