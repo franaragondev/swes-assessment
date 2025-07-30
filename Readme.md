@@ -61,7 +61,7 @@ The SWES Reservation Module is a web application that allows users to:
 
 1. Clone the repository:  
    ```bash
-   git clone https://github.com/franaragondev/swes-reservation-module.git
+   git clone https://github.com/franaragondev/swes-assessment.git
    ```
 
 2.	Open index.html in a modern web browser (Chrome, Firefox, Edge).
