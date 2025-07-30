@@ -1,3 +1,5 @@
+import { fetchData } from "./api.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   // DOM elements
   const tableBody = document.getElementById("equipment-table-body");
@@ -19,6 +21,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Use the selected rows per page from dropdown, default to 10
   let rowsPerPage = parseInt(rowsPerPageSelect.value, 10);
 
+  // Store fetched data here
+  let allData = [];
+
   // Listen for rows per page change to update pagination and re-render
   rowsPerPageSelect.addEventListener("change", () => {
     rowsPerPage = parseInt(rowsPerPageSelect.value, 10);
@@ -26,15 +31,15 @@ document.addEventListener("DOMContentLoaded", () => {
     renderTable();
   });
 
-  // Sorting configuration
+  // Sorting
   let sortField = "date";
   let sortDirection = "asc";
 
   /**
    * Filters the dataset based on selected filters
    */
-  function filterData() {
-    return dummyData.filter((record) => {
+  function filterData(data) {
+    return data.filter((record) => {
       if (startDateInput.value && record.date < startDateInput.value)
         return false;
       if (endDateInput.value && record.date > endDateInput.value) return false;
@@ -81,8 +86,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(".table-wrapper").classList.add("loading");
 
     setTimeout(() => {
-      const filteredData = filterData();
-      const sortedData = sortData(filteredData);
+      let filteredData = filterData(allData);
+      let sortedData = sortData(filteredData);
 
       const start = (currentPage - 1) * rowsPerPage;
       const end = start + rowsPerPage;
@@ -94,9 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (paginatedData.length === 0) {
         tableBody.innerHTML = `
           <tr>
-            <td colspan="6" class="text-center text-muted">
-              No records found
-            </td>
+            <td colspan="6" class="text-center text-muted">No records found</td>
           </tr>`;
       } else {
         paginatedData.forEach((record) => {
@@ -249,6 +252,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (icon) icon.className = "bi bi-arrow-up";
   }
 
-  // Initial render
-  renderTable();
+  // Initial fetch and render
+  fetchData()
+    .then((data) => {
+      allData = data;
+      renderTable();
+    })
+    .catch((error) => {
+      console.error("Error fetching data:", error);
+      tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error loading data</td></tr>`;
+    });
 });

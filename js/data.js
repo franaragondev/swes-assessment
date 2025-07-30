@@ -1,5 +1,5 @@
 // Array to hold 100 dummy records
-const dummyData = [];
+export const dummyData = [];
 
 // Possible values for random generation
 const items = ["Boots", "Helmet", "Vest"];
