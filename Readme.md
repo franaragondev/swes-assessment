@@ -89,9 +89,8 @@ The SWES Reservation Module is a web application that allows users to:
 
 ## Contact
 
-For any inquiries related to this technical assessment, contact:
-Fran Aragón
+For any inquiries related to this technical assessment, contact:  
+**Fran Aragón**  
 Email: franaragondeveloper@gmail.com
-
 
 Thank you for reviewing this project!
