@@ -18,3 +18,15 @@
   font-size: 0.9rem;
   box-sizing: border-box;
 }
+
+.reserved-day {
+  background-color: #f8d7da !important; /* light red */
+  color: #721c24 !important;
+  cursor: not-allowed !important;
+  border-color: #f5c6cb !important;
+}
+
+.past-day {
+  color: #6c757d;
+  text-decoration: line-through;
+}
