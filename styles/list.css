@@ -4,34 +4,34 @@
   color: #f4f4f4 !important;
 }
 
-/* Default icon color for sort indicators (inactive state) */
+/* Sort icons default color (inactive) */
 th[data-sort] i {
-  color: #888; /* faded gray */
+  color: #888;
   transition: color 0.3s ease;
 }
 
-/* Icon color when the column is the active sorted column */
+/* Sort icon color when active */
 th[data-sort].active-sort i {
-  color: #f4d35e; /* yellow highlight */
+  color: #f4d35e;
 }
 
 /* Pagination container layout */
 .pagination {
   display: flex;
-  gap: 0.3rem; /* spacing between buttons */
+  gap: 0.3rem;
   justify-content: center;
   padding-left: 0;
   list-style: none;
 }
 
-/* Pagination list item styling */
+/* Pagination list item */
 .pagination .page-item {
   border-radius: 6px;
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Pagination buttons styling */
+/* Pagination button */
 .pagination .page-link {
   border: none;
   background-color: #2c3e50;
@@ -43,13 +43,13 @@ th[data-sort].active-sort i {
   transition: background-color 0.3s ease;
 }
 
-/* Hover effect for pagination buttons */
+/* Hover effect */
 .pagination .page-link:hover {
   background-color: #f4d35e;
   color: #1b2430;
 }
 
-/* Styling for the active page in pagination */
+/* Active page */
 .pagination .active .page-link {
   background-color: #f4d35e;
   color: #1b2430;
@@ -58,7 +58,7 @@ th[data-sort].active-sort i {
   pointer-events: none;
 }
 
-/* Styling for disabled pagination buttons */
+/* Disabled pagination button */
 .pagination .disabled .page-link {
   background-color: #e0e0e0;
   color: #999;
@@ -66,14 +66,43 @@ th[data-sort].active-sort i {
   pointer-events: none;
 }
 
-/* Responsive table design for devices up to 768px wide */
+/* Wrapper around table for overlay */
+.table-wrapper {
+  position: relative;
+}
+
+/* Overlay that appears during loading */
+.table-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* Active overlay state (visible) */
+.table-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Blur + grayscale to table when overlay is active */
+.table-wrapper.loading table {
+  filter: grayscale(100%) blur(2px);
+  transition: filter 0.2s ease;
+}
+
+/* Responsive table for mobile */
 @media (max-width: 768px) {
-  /* Hide table headers */
   table#equipment-table thead {
     display: none;
   }
 
-  /* Convert table elements to block for card layout */
   table#equipment-table,
   table#equipment-table tbody,
   table#equipment-table tr,
@@ -82,7 +111,6 @@ th[data-sort].active-sort i {
     width: 100%;
   }
 
-  /* Style each row as a card */
   table#equipment-table tr {
     background: #fff;
     margin-bottom: 1rem;
@@ -91,7 +119,6 @@ th[data-sort].active-sort i {
     padding: 0.5rem;
   }
 
-  /* Style table cells in card layout */
   table#equipment-table td {
     text-align: left;
     padding: 0.5rem;
@@ -99,14 +126,12 @@ th[data-sort].active-sort i {
     border-bottom: 1px solid #eee;
   }
 
-  /* Remove bottom border from the last cell */
   table#equipment-table td:last-child {
     border-bottom: none;
   }
 
-  /* Add labels before cell content for mobile layout */
   table#equipment-table td::before {
-    content: attr(data-label); /* use data-label attribute as a label */
+    content: attr(data-label);
     font-weight: 600;
     display: block;
     margin-bottom: 0.3rem;

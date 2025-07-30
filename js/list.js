@@ -1,10 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Select table body, pagination container and loading spinner
+  // DOM elements
   const tableBody = document.getElementById("equipment-table-body");
   const pagination = document.getElementById("pagination");
-  const spinner = document.getElementById("loading-spinner");
+  const overlay = document.getElementById("table-overlay");
 
-  // Select filter elements
+  // Filters
   const startDateInput = document.getElementById("filter-date-start");
   const endDateInput = document.getElementById("filter-date-end");
   const itemTypeSelect = document.getElementById("filter-item-type");
@@ -18,56 +18,46 @@ document.addEventListener("DOMContentLoaded", () => {
   const rowsPerPage = 10;
 
   // Sorting configuration
-  let sortField = "date"; // Default sort column
-  let sortDirection = "asc"; // Default sort direction
+  let sortField = "date";
+  let sortDirection = "asc";
 
   /**
-   * Filter data based on filters (dates, status, type, search)
+   * Filters the dataset based on selected filters
    */
   function filterData() {
     return dummyData.filter((record) => {
-      // Date range filter
       if (startDateInput.value && record.date < startDateInput.value)
         return false;
       if (endDateInput.value && record.date > endDateInput.value) return false;
-
-      // Item type filter
       if (itemTypeSelect.value && record.itemName !== itemTypeSelect.value)
         return false;
-
-      // Status filters
       if (!statusReturned.checked && record.status === "Returned") return false;
       if (!statusPending.checked && record.status === "Pending") return false;
       if (!statusOverdue.checked && record.status === "Overdue") return false;
 
-      // Search filter (employee name or item ID)
       const searchTerm = searchInput.value.toLowerCase();
-      if (
-        searchTerm &&
-        !record.employeeName.toLowerCase().includes(searchTerm) &&
-        !record.itemId.toLowerCase().includes(searchTerm)
-      )
-        return false;
-
-      return true;
+      return (
+        !searchTerm ||
+        record.employeeName.toLowerCase().includes(searchTerm) ||
+        record.itemId.toLowerCase().includes(searchTerm)
+      );
     });
   }
 
   /**
-   * Sort data based on current sort field and direction
+   * Sorts data based on the selected field and direction
    */
   function sortData(data) {
     return data.sort((a, b) => {
       let valA = a[sortField] || "";
       let valB = b[sortField] || "";
 
-      // Handle date fields (convert to Date objects)
+      // Handle date sorting
       if (sortField === "date" || sortField === "returnDate") {
         valA = valA ? new Date(valA) : new Date(0);
         valB = valB ? new Date(valB) : new Date(0);
       }
 
-      // Compare values
       if (valA < valB) return sortDirection === "asc" ? -1 : 1;
       if (valA > valB) return sortDirection === "asc" ? 1 : -1;
       return 0;
@@ -75,24 +65,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Render table rows and pagination
+   * Renders the table and activates the overlay while loading
    */
   function renderTable() {
-    // Show loading spinner
-    spinner.classList.remove("d-none");
-    tableBody.innerHTML = "";
+    overlay.classList.add("active");
+    document.querySelector(".table-wrapper").classList.add("loading");
 
-    // Delay for better UX simulation
     setTimeout(() => {
       const filteredData = filterData();
       const sortedData = sortData(filteredData);
 
-      // Get data for current page
       const start = (currentPage - 1) * rowsPerPage;
       const end = start + rowsPerPage;
       const paginatedData = sortedData.slice(start, end);
 
-      // Empty state
+      tableBody.innerHTML = "";
+
+      // Render rows
       if (paginatedData.length === 0) {
         tableBody.innerHTML = `
           <tr>
@@ -101,16 +90,14 @@ document.addEventListener("DOMContentLoaded", () => {
             </td>
           </tr>`;
       } else {
-        // Create rows
         paginatedData.forEach((record) => {
           const row = document.createElement("tr");
 
-          // Add background color based on status
+          // Row background based on status
           if (record.status === "Overdue") row.classList.add("table-danger");
           if (record.status === "Pending") row.classList.add("table-warning");
           if (record.status === "Returned") row.classList.add("table-success");
 
-          // Fill cells with data
           row.innerHTML = `
             <td data-label="Date">${record.date}</td>
             <td data-label="Item Name">${record.itemName}</td>
@@ -126,20 +113,21 @@ document.addEventListener("DOMContentLoaded", () => {
       // Render pagination
       renderPagination(filteredData.length);
 
-      // Hide loading spinner
-      spinner.classList.add("d-none");
+      // Hide overlay
+      overlay.classList.remove("active");
+      document.querySelector(".table-wrapper").classList.remove("loading");
     }, 400);
   }
 
   /**
-   * Render pagination buttons (show only 3 pages + controls)
+   * Renders the pagination buttons
    */
   function renderPagination(totalItems) {
     const totalPages = Math.ceil(totalItems / rowsPerPage);
     pagination.innerHTML = "";
     if (totalPages <= 1) return;
 
-    // Helper to create pagination buttons
+    // Create pagination button helper
     function createPageItem(
       page,
       text = null,
@@ -150,12 +138,10 @@ document.addEventListener("DOMContentLoaded", () => {
       li.className = `page-item${active ? " active" : ""}${
         disabled ? " disabled" : ""
       }`;
-
       const btn = document.createElement("button");
       btn.className = "page-link";
       btn.textContent = text || page;
 
-      // Add click event
       if (!disabled && !active) {
         btn.addEventListener("click", () => {
           currentPage = page;
@@ -166,23 +152,19 @@ document.addEventListener("DOMContentLoaded", () => {
       return li;
     }
 
-    // First & Previous buttons
     pagination.appendChild(createPageItem(1, "«", currentPage === 1));
     pagination.appendChild(
       createPageItem(currentPage - 1, "‹", currentPage === 1)
     );
 
-    // Calculate start and end page range (max 3 pages)
     let startPage = Math.max(currentPage - 1, 1);
     let endPage = Math.min(startPage + 2, totalPages);
     if (endPage - startPage < 2) startPage = Math.max(endPage - 2, 1);
 
-    // Add page number buttons
     for (let i = startPage; i <= endPage; i++) {
       pagination.appendChild(createPageItem(i, null, false, i === currentPage));
     }
 
-    // Next & Last buttons
     pagination.appendChild(
       createPageItem(currentPage + 1, "›", currentPage === totalPages)
     );
@@ -191,9 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  /**
-   * Listen to filter inputs (reset to page 1)
-   */
+  // Listen for filter changes
   [
     startDateInput,
     endDateInput,
@@ -209,9 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   );
 
-  /**
-   * Listen to column headers for sorting
-   */
+  // Sorting event listeners
   const headers = document.querySelectorAll(
     "#equipment-table thead th[data-sort]"
   );
@@ -219,22 +197,18 @@ document.addEventListener("DOMContentLoaded", () => {
     th.addEventListener("click", () => {
       const field = th.getAttribute("data-sort");
 
-      // Toggle direction if same column is clicked
-      if (sortField === field) {
-        sortDirection = sortDirection === "asc" ? "desc" : "asc";
-      } else {
-        sortField = field;
-        sortDirection = "asc";
-      }
+      // Toggle sort direction
+      sortDirection =
+        sortField === field && sortDirection === "asc" ? "desc" : "asc";
+      sortField = field;
 
-      // Reset all headers
+      // Update header icons
       headers.forEach((el) => {
         el.classList.remove("active-sort");
         const icon = el.querySelector("i");
-        if (icon) icon.className = "bi bi-arrow-down-up"; // Reset icon
+        if (icon) icon.className = "bi bi-arrow-down-up";
       });
 
-      // Highlight the active sorted column
       th.classList.add("active-sort");
       const icon = th.querySelector("i");
       if (icon)
@@ -245,9 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /**
-   * Set default sorted column
-   */
+  // Set default sorted column
   const defaultHeader = document.querySelector(
     `#equipment-table thead th[data-sort="${sortField}"]`
   );
@@ -257,6 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (icon) icon.className = "bi bi-arrow-up";
   }
 
-  // Initial table render
+  // Initial render
   renderTable();
 });
