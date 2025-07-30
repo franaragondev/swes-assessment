@@ -9,6 +9,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!calendarContainer || !reservationDateInput || !itemSelect) return;
 
+  // Load item types into the calendar select dropdown
+  getItemTypes().then((types) => {
+    itemSelect.innerHTML = `<option value="">Select item</option>`;
+    types.forEach((type) => {
+      const option = document.createElement("option");
+      option.value = type;
+      option.textContent = type;
+      itemSelect.appendChild(option);
+    });
+  });
+
   // Constants
   const monthNames = [
     "January",
