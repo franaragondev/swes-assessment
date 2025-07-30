@@ -68,9 +68,14 @@ th[data-sort].active-sort i {
 
 /* Wrapper around table for overlay */
 .table-wrapper {
-  position: relative;
-  max-height: 400px; /* fixed height or max height for scroll */
-  overflow-y: auto; /* vertical scroll if content exceeds height */
+  position: relative; /* allows absolute-positioned children like overlay or empty-state messages */
+  max-height: 400px; /* maximum height of the table container before scrolling */
+  min-height: 400px; /* ensures a fixed minimum height even if there are few or no rows */
+  overflow-y: auto; /* adds vertical scroll when content exceeds the max height */
+  border: 1px solid rgba(27, 36, 48, 0.1); /* subtle border with low opacity */
+  border-radius: 8px; /* rounded corners for a softer look */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* light shadow for depth */
+  background: #fff; /* ensure background contrasts with shadow */
 }
 
 /* Ensure sticky headers behave properly */
