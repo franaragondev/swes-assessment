@@ -148,10 +148,9 @@ document.addEventListener("DOMContentLoaded", () => {
           renderTable();
 
           // Scroll to top on page change (for mobile/cards)
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          });
+          if (window.innerWidth <= 768) {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
         });
       }
       li.appendChild(btn);
