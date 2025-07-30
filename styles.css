@@ -1,0 +1,69 @@
+/* ---------- GENERAL ---------- */
+body {
+  font-family: "Inter", "Segoe UI", sans-serif;
+  background-color: #f9f9fb;
+  color: #333;
+}
+
+/* ---------- HEADER ---------- */
+header.navbar {
+  background: linear-gradient(135deg, #1b2430, #2c3e50); /* dark gradient */
+  padding: 0.8rem 1.2rem;
+}
+
+header .navbar-brand {
+  font-size: 1.2rem;
+  color: #f4f4f4 !important;
+}
+
+header .navbar-brand i {
+  color: #f4d35e; /* accent color for icon */
+}
+
+header .nav-link {
+  color: #dcdcdc !important;
+  font-weight: 500;
+  margin-left: 0.5rem;
+  transition: color 0.3s ease, background 0.3s ease;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+}
+
+header .nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff !important;
+}
+
+header .nav-link.active {
+  background: #f4d35e;
+  color: #1b2430 !important;
+}
+
+/* ---------- HEADINGS ---------- */
+main h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #2c3e50;
+  border-bottom: 2px solid #f4d35e;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ---------- RESPONSIVENESS ---------- */
+@media (max-width: 768px) {
+  header .navbar-brand {
+    font-size: 1rem;
+  }
+
+  main h2 {
+    font-size: 1.3rem;
+  }
+}
+
+/* Extra padding for nav items in mobile view */
+@media (max-width: 991px) {
+  .navbar-collapse .nav-item {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
