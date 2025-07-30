@@ -1,11 +1,3 @@
-/* ---------- GENERAL ---------- */
-body {
-  font-family: "Inter", "Segoe UI", sans-serif;
-  background-color: #f9f9fb;
-  color: #333;
-}
-
-/* ---------- HEADER ---------- */
 header.navbar {
   background: linear-gradient(135deg, #1b2430, #2c3e50); /* dark gradient */
   padding: 0.8rem 1.2rem;

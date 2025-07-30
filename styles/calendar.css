@@ -1,0 +1,20 @@
+.calendar-weekdays,
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  user-select: none;
+}
+
+.calendar-weekdays > div {
+  font-weight: 600;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.calendar-days > button {
+  border: 1px solid #ddd;
+  padding: 0;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
