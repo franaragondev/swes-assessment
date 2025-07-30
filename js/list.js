@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tableBody.innerHTML = `
           <tr>
             <td colspan="6" class="text-center text-muted">
-              <i class="bi bi-emoji-frown fs-4"></i> No records found
+              No records found
             </td>
           </tr>`;
       } else {
