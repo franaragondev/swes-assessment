@@ -8,18 +8,18 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Safely get inputs by name
+    // Get form inputs safely
     const employeeIdInput = form.querySelector('[name="employeeId"]');
     const itemSelect = form.querySelector('[name="item"]');
     const dateInput = form.querySelector('[name="reservationDate"]');
 
-    // If any input is missing, log error and stop
+    // Stop if any input is missing
     if (!employeeIdInput || !itemSelect || !dateInput) {
       console.error("One or more form elements could not be found!");
       return;
     }
 
-    // Reset alert styles and message
+    // Reset alert state before validation
     alertDiv.classList.add("d-none");
     alertDiv.textContent = "";
     alertDiv.classList.remove("alert-success", "alert-danger", "alert-info");
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
       employeeIdInput.classList.remove("is-invalid");
     }
 
-    // Validate Item selection
+    // Validate Item selection (must be selected)
     if (!itemSelect.value) {
       itemSelect.classList.add("is-invalid");
       valid = false;
@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Stop if form is invalid
     if (!valid) return;
 
-    // Prepare data to send to API
+    // Prepare reservation data for the API
     const reservationData = {
       employeeId: employeeIdInput.value.trim(),
       item: itemSelect.value,
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
     alertDiv.classList.add("alert-info");
 
     try {
-      // Call API (mocked createReservation)
+      // Call the API and wait for the result
       const response = await createReservation(reservationData);
 
       // Show success message
@@ -78,28 +78,32 @@ document.addEventListener("DOMContentLoaded", () => {
       alertDiv.classList.remove("alert-info");
       alertDiv.classList.add("alert-success");
 
-      // Reset form fields
-      form.reset();
+      // Delay form reset so the user can read the success message
+      setTimeout(() => {
+        form.reset();
+        alertDiv.classList.add("d-none");
+        alertDiv.textContent = "";
+        alertDiv.classList.remove("alert-success");
+      }, 2000);
 
-      // Dispatch a custom event to notify other views (calendar/list) to refresh
-      const event = new CustomEvent("reservation-updated");
-      document.dispatchEvent(event);
+      // Notify other views (list/calendar) to refresh after reservation
+      document.dispatchEvent(new CustomEvent("reservation-updated"));
     } catch (error) {
-      // Show error message if reservation cannot be created
+      // Show error message
       alertDiv.textContent = error.message;
       alertDiv.classList.remove("alert-info");
       alertDiv.classList.add("alert-danger");
     }
   });
 
-  // Handle form reset (clear validation errors and alerts)
+  // Handle manual reset (when user clicks the "Clear" button)
   form.addEventListener("reset", () => {
-    // Remove invalid classes from all inputs
+    // Clear validation classes
     form
       .querySelectorAll(".is-invalid")
       .forEach((el) => el.classList.remove("is-invalid"));
 
-    // Hide alert and reset its classes and text
+    // Hide and reset alert box
     alertDiv.classList.add("d-none");
     alertDiv.textContent = "";
     alertDiv.classList.remove("alert-success", "alert-danger", "alert-info");
