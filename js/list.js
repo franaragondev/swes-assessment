@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.getElementById("equipment-table-body");
   const pagination = document.getElementById("pagination");
   const overlay = document.getElementById("table-overlay");
+  const rowsPerPageSelect = document.getElementById("rows-per-page");
 
   // Filters
   const startDateInput = document.getElementById("filter-date-start");
@@ -15,7 +16,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Pagination configuration
   let currentPage = 1;
-  const rowsPerPage = 10;
+  // Use the selected rows per page from dropdown, default to 10
+  let rowsPerPage = parseInt(rowsPerPageSelect.value, 10);
+
+  // Listen for rows per page change to update pagination and re-render
+  rowsPerPageSelect.addEventListener("change", () => {
+    rowsPerPage = parseInt(rowsPerPageSelect.value, 10);
+    currentPage = 1; // reset page to first when page size changes
+    renderTable();
+  });
 
   // Sorting configuration
   let sortField = "date";

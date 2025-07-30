@@ -141,6 +141,15 @@
                     placeholder="Search by employee or item ID" />
             </div>
 
+            <div class="mb-3 d-flex align-items-center">
+                <label for="rows-per-page" class="form-label me-2 mb-0">Rows per page:</label>
+                <select id="rows-per-page" class="form-select w-auto">
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+
             <!-- Table with overlay loader -->
             <div class="table-responsive table-wrapper">
                 <!-- Overlay (keeps table visible and shows loader) -->
