@@ -68,14 +68,18 @@ th[data-sort].active-sort i {
 
 /* Wrapper around table for overlay */
 .table-wrapper {
-  position: relative; /* allows absolute-positioned children like overlay or empty-state messages */
-  max-height: 400px; /* maximum height of the table container before scrolling */
-  min-height: 400px; /* ensures a fixed minimum height even if there are few or no rows */
-  overflow-y: auto; /* adds vertical scroll when content exceeds the max height */
-  border: 1px solid rgba(27, 36, 48, 0.1); /* subtle border with low opacity */
-  border-radius: 8px; /* rounded corners for a softer look */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* light shadow for depth */
-  background: #fff; /* ensure background contrasts with shadow */
+  position: relative;
+  min-height: 400px;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid rgba(27, 36, 48, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  background: #fff;
+}
+
+table#equipment-table {
+  margin-bottom: 0;
 }
 
 /* Ensure sticky headers behave properly */
