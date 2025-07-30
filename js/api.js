@@ -38,3 +38,46 @@ export function getItemTypes() {
    *   });
    */
 }
+
+// Simulate POST request to create a reservation
+export function createReservation(data) {
+  return new Promise((resolve, reject) => {
+    // Simulate backend validation and save
+    setTimeout(() => {
+      // Check if date is already reserved for the selected item
+      const exists = dummyData.some(
+        (res) => res.itemName === data.item && res.date === data.reservationDate
+      );
+
+      if (exists) {
+        reject(
+          new Error("This date is already reserved for the selected item.")
+        );
+      } else {
+        // Add to dummyData (simulate saving)
+        dummyData.push({
+          date: data.reservationDate,
+          itemName: data.item,
+          status: "Pending",
+          returnDate: "",
+          employeeName: data.employeeId, // or map employee ID to name
+          itemId: `${data.item[0]}${100 + dummyData.length + 1}`,
+        });
+        resolve({ message: "Reservation created successfully!" });
+      }
+    }, 700);
+  });
+
+  /**
+   * Real implementation with fetch() (backend)
+   *
+   * return fetch(`${API_BASE_URL}/api/reservations`, {
+   *   method: 'POST',
+   *   headers: { 'Content-Type': 'application/json' },
+   *   body: JSON.stringify(data)
+   * }).then((response) => {
+   *   if (!response.ok) throw new Error('Error creating reservation');
+   *   return response.json();
+   * });
+   */
+}

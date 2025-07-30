@@ -15,19 +15,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const statusOverdue = document.getElementById("status-overdue");
   const searchInput = document.getElementById("filter-search");
 
-  // Pagination configuration
+  // Pagination state
   let currentPage = 1;
-  // Use the selected rows per page from dropdown, default to 10
   let rowsPerPage = parseInt(rowsPerPageSelect.value, 10);
 
-  // Store fetched data here
+  // Storage for all fetched data
   let allData = [];
 
-  // Date filters (strings in "YYYY-MM-DD" format)
+  // Date filter variables (YYYY-MM-DD strings)
   let filterStartDate = "";
   let filterEndDate = "";
 
-  // Load item types dynamically
+  // Load item types dynamically into filter dropdown
   getItemTypes().then((types) => {
     itemTypeSelect.innerHTML = `<option value="">All</option>`;
     types.forEach((type) => {
@@ -38,7 +37,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Helper function to format a Date object to "YYYY-MM-DD" in local time
+  // Listen for custom event 'reservation-updated' from form.js
+  // When triggered, refetch data and reset to first page
+  document.addEventListener("reservation-updated", () => {
+    fetchData().then((data) => {
+      allData = data;
+      currentPage = 1; // Reset pagination to first page
+      renderTable();
+    });
+  });
+
+  // Helper function to format Date object as "YYYY-MM-DD"
   function formatDateLocal(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -46,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${year}-${month}-${day}`;
   }
 
-  // Initialize flatpickr in range mode
+  // Initialize flatpickr date range picker
   flatpickr(dateRangeInput, {
     mode: "range",
     dateFormat: "Y-m-d",
@@ -58,28 +67,25 @@ document.addEventListener("DOMContentLoaded", () => {
         filterStartDate = "";
         filterEndDate = "";
       }
-      currentPage = 1;
+      currentPage = 1; // Reset page on filter change
       renderTable();
     },
   });
 
-  // Update rows per page and reset to first page
+  // Handle change in rows per page dropdown
   rowsPerPageSelect.addEventListener("change", () => {
     rowsPerPage = parseInt(rowsPerPageSelect.value, 10);
-    currentPage = 1; // reset page to first when page size changes
+    currentPage = 1; // Reset page when page size changes
     renderTable();
   });
 
-  // Sorting
+  // Sorting state variables
   let sortField = "date";
   let sortDirection = "asc";
 
-  /**
-   * Filters the dataset based on selected filters
-   */
+  // Filter dataset based on current filters
   function filterData(data) {
     return data.filter((record) => {
-      // Extract the date part "YYYY-MM-DD" from the record's date string
       const recordDateStr = record.date.slice(0, 10);
 
       if (filterStartDate && recordDateStr < filterStartDate) return false;
@@ -101,15 +107,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /**
-   * Sorts data based on the selected field and direction
-   */
+  // Sort data by current sorting field and direction
   function sortData(data) {
     return data.sort((a, b) => {
       let valA = a[sortField] || "";
       let valB = b[sortField] || "";
 
-      // For date fields, parse into Date objects
+      // Parse dates if sorting by date fields
       if (sortField === "date" || sortField === "returnDate") {
         valA = valA ? new Date(valA) : new Date(0);
         valB = valB ? new Date(valB) : new Date(0);
@@ -121,23 +125,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /**
-   * Renders the table and activates the overlay while loading
-   */
+  // Render table rows and pagination
   function renderTable() {
     overlay.classList.add("active");
     document.querySelector(".table-wrapper").classList.add("loading");
-    1;
 
-    /**
-     * Use setTimeout to simulate a network delay and ensure the loading spinner is visible
-     * before rendering the table. In a real API call, this would be replaced by the async fetch().
-     */
     setTimeout(() => {
       const filteredData = filterData(allData);
       const sortedData = sortData(filteredData);
 
-      // Update results count
+      // Update results count display
       const resultsCountEl = document.getElementById("results-count");
       if (resultsCountEl) {
         resultsCountEl.textContent = `${filteredData.length} result${
@@ -145,63 +142,61 @@ document.addEventListener("DOMContentLoaded", () => {
         } found`;
       }
 
+      // Calculate pagination slice
       const start = (currentPage - 1) * rowsPerPage;
       const end = start + rowsPerPage;
       const paginatedData = sortedData.slice(start, end);
 
       tableBody.innerHTML = "";
 
-      // Render rows
+      // Render rows or "No records" message
       if (paginatedData.length === 0) {
         tableBody.innerHTML = `
-        <tr>
-          <td colspan="6" class="text-center text-muted">No records found</td>
-        </tr>`;
+          <tr>
+            <td colspan="6" class="text-center text-muted">No records found</td>
+          </tr>`;
       } else {
         paginatedData.forEach((record) => {
           const row = document.createElement("tr");
 
-          // Row background based on status
+          // Apply row color based on status
           if (record.status === "Overdue") row.classList.add("table-danger");
           if (record.status === "Pending") row.classList.add("table-warning");
           if (record.status === "Returned") row.classList.add("table-success");
 
           row.innerHTML = `
-          <td data-label="Date">${record.date}</td>
-          <td data-label="Item Name">${record.itemName}</td>
-          <td data-label="Status">${record.status}</td>
-          <td data-label="Return Date">${record.returnDate || "-"}</td>
-          <td data-label="Employee Name">${record.employeeName}</td>
-          <td data-label="Item ID">${record.itemId}</td>
-        `;
+            <td data-label="Date">${record.date}</td>
+            <td data-label="Item Name">${record.itemName}</td>
+            <td data-label="Status">${record.status}</td>
+            <td data-label="Return Date">${record.returnDate || "-"}</td>
+            <td data-label="Employee Name">${record.employeeName}</td>
+            <td data-label="Item ID">${record.itemId}</td>
+          `;
           tableBody.appendChild(row);
         });
       }
 
-      // Render pagination
       renderPagination(filteredData.length);
 
-      // Scroll the table-wrapper container to the top
+      // Scroll table wrapper to top smoothly
       const tableWrapper = document.querySelector(".table-wrapper");
       if (tableWrapper) {
         tableWrapper.scrollTo({ top: 0, behavior: "smooth" });
       }
 
-      // Hide overlay
+      // Hide loading overlay
       overlay.classList.remove("active");
       document.querySelector(".table-wrapper").classList.remove("loading");
     }, 400);
   }
 
-  /**
-   * Renders the pagination buttons
-   */
+  // Render pagination controls
   function renderPagination(totalItems) {
     const totalPages = Math.ceil(totalItems / rowsPerPage);
     pagination.innerHTML = "";
     if (totalPages <= 1) return;
 
-    // Create pagination button helper
+    // Helper to create pagination button
     function createPageItem(
       page,
       text = null,
@@ -221,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
           currentPage = page;
           renderTable();
 
-          // Scroll to top on page change (for mobile/cards)
+          // Scroll to top on mobile for better UX
           if (window.innerWidth <= 768) {
             window.scrollTo({ top: 0, behavior: "smooth" });
           }
@@ -252,7 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // Listen for filter changes to re-render table and reset page to 1
+  // Add input event listeners to filters to reset page and re-render
   [
     itemTypeSelect,
     statusReturned,
@@ -266,7 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   );
 
-  // Sorting event listeners
+  // Add click event listeners for sortable table headers
   const headers = document.querySelectorAll(
     "#equipment-table thead th[data-sort]"
   );
@@ -274,12 +269,12 @@ document.addEventListener("DOMContentLoaded", () => {
     th.addEventListener("click", () => {
       const field = th.getAttribute("data-sort");
 
-      // Toggle sort direction if same field, else set ascending
+      // Toggle sorting direction if sorting the same field
       sortDirection =
         sortField === field && sortDirection === "asc" ? "desc" : "asc";
       sortField = field;
 
-      // Update active sort icons
+      // Update sort icons UI
       headers.forEach((el) => {
         el.classList.remove("active-sort");
         const icon = el.querySelector("i");
@@ -296,7 +291,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Set default sorted column icon
+  // Set default sort icon on page load
   const defaultHeader = document.querySelector(
     `#equipment-table thead th[data-sort="${sortField}"]`
   );
@@ -306,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (icon) icon.className = "bi bi-arrow-up";
   }
 
-  // Fetch data and render table initially
+  // Initial data fetch and render on page load
   fetchData()
     .then((data) => {
       allData = data;

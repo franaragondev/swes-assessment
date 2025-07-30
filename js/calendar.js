@@ -1,4 +1,5 @@
 import { fetchData, getItemTypes } from "./api.js";
+export let reservedDatesForCurrentItem = new Set();
 
 document.addEventListener("DOMContentLoaded", () => {
   const calendarContainer = document.getElementById("calendar");
@@ -37,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentYear, currentMonth;
   let reservations = []; // All reservations loaded from API
-  let reservedDatesForCurrentItem = new Set(); // Reserved dates (strings) for currently selected item
 
   /** Returns the number of days in a specific month and year */
   function daysInMonth(month, year) {
@@ -238,7 +238,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       reservedDatesForCurrentItem.clear();
     }
-    console.log("Selected item:", selectedItem);
     createDaysGrid(year, month);
   }
 
@@ -262,3 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   init();
 });
+
+export function isDateAvailable(item, date) {
+  return !reservedDatesForCurrentItem.has(date);
+}
