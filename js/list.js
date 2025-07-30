@@ -127,10 +127,23 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderTable() {
     overlay.classList.add("active");
     document.querySelector(".table-wrapper").classList.add("loading");
+    1;
 
+    /**
+     * Use setTimeout to simulate a network delay and ensure the loading spinner is visible
+     * before rendering the table. In a real API call, this would be replaced by the async fetch().
+     */
     setTimeout(() => {
       const filteredData = filterData(allData);
       const sortedData = sortData(filteredData);
+
+      // Update results count
+      const resultsCountEl = document.getElementById("results-count");
+      if (resultsCountEl) {
+        resultsCountEl.textContent = `${filteredData.length} result${
+          filteredData.length !== 1 ? "s" : ""
+        } found`;
+      }
 
       const start = (currentPage - 1) * rowsPerPage;
       const end = start + rowsPerPage;
@@ -141,9 +154,9 @@ document.addEventListener("DOMContentLoaded", () => {
       // Render rows
       if (paginatedData.length === 0) {
         tableBody.innerHTML = `
-          <tr>
-            <td colspan="6" class="text-center text-muted">No records found</td>
-          </tr>`;
+        <tr>
+          <td colspan="6" class="text-center text-muted">No records found</td>
+        </tr>`;
       } else {
         paginatedData.forEach((record) => {
           const row = document.createElement("tr");
@@ -154,13 +167,13 @@ document.addEventListener("DOMContentLoaded", () => {
           if (record.status === "Returned") row.classList.add("table-success");
 
           row.innerHTML = `
-            <td data-label="Date">${record.date}</td>
-            <td data-label="Item Name">${record.itemName}</td>
-            <td data-label="Status">${record.status}</td>
-            <td data-label="Return Date">${record.returnDate || "-"}</td>
-            <td data-label="Employee Name">${record.employeeName}</td>
-            <td data-label="Item ID">${record.itemId}</td>
-          `;
+          <td data-label="Date">${record.date}</td>
+          <td data-label="Item Name">${record.itemName}</td>
+          <td data-label="Status">${record.status}</td>
+          <td data-label="Return Date">${record.returnDate || "-"}</td>
+          <td data-label="Employee Name">${record.employeeName}</td>
+          <td data-label="Item ID">${record.itemId}</td>
+        `;
           tableBody.appendChild(row);
         });
       }
