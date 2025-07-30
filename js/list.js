@@ -146,6 +146,12 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.addEventListener("click", () => {
           currentPage = page;
           renderTable();
+
+          // Scroll to top on page change (for mobile/cards)
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
         });
       }
       li.appendChild(btn);
