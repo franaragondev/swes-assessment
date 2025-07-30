@@ -122,6 +122,12 @@ document.addEventListener("DOMContentLoaded", () => {
       // Render pagination
       renderPagination(filteredData.length);
 
+      // Scroll the table-wrapper container to the top
+      const tableWrapper = document.querySelector(".table-wrapper");
+      if (tableWrapper) {
+        tableWrapper.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
       // Hide overlay
       overlay.classList.remove("active");
       document.querySelector(".table-wrapper").classList.remove("loading");

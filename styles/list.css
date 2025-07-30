@@ -69,6 +69,16 @@ th[data-sort].active-sort i {
 /* Wrapper around table for overlay */
 .table-wrapper {
   position: relative;
+  max-height: 400px; /* fixed height or max height for scroll */
+  overflow-y: auto; /* vertical scroll if content exceeds height */
+}
+
+/* Ensure sticky headers behave properly */
+table#equipment-table thead th {
+  position: sticky;
+  top: 0;
+  background: #1b2430 !important; /* keep same bg to overlay content below */
+  z-index: 5;
 }
 
 /* Overlay that appears during loading */
