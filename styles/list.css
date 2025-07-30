@@ -2,3 +2,65 @@
   background: #1b2430 !important;
   color: #f4f4f4 !important;
 }
+
+/* Icon color when inactive by default */
+th[data-sort] i {
+  color: #888; /* faded gray */
+  transition: color 0.3s ease;
+}
+
+/* Icon color when active (sorted column) */
+th[data-sort].active-sort i {
+  color: #f4d35e; /* yellow highlight */
+}
+
+/* Pagination container */
+.pagination {
+  display: flex;
+  gap: 0.3rem;
+  justify-content: center;
+  padding-left: 0;
+  list-style: none;
+}
+
+/* Pagination item */
+.pagination .page-item {
+  border-radius: 6px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Pagination link (buttons) */
+.pagination .page-link {
+  border: none;
+  background-color: #2c3e50;
+  color: #f4f4f4;
+  padding: 0.4rem 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover effect */
+.pagination .page-link:hover {
+  background-color: #f4d35e;
+  color: #1b2430;
+}
+
+/* Active page */
+.pagination .active .page-link {
+  background-color: #f4d35e;
+  color: #1b2430;
+  font-weight: 600;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Disabled buttons */
+.pagination .disabled .page-link {
+  background-color: #e0e0e0;
+  color: #999;
+  cursor: default;
+  pointer-events: none;
+}
