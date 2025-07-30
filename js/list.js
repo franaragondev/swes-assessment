@@ -8,8 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const rowsPerPageSelect = document.getElementById("rows-per-page");
 
   // Filters
-  const startDateInput = document.getElementById("filter-date-start");
-  const endDateInput = document.getElementById("filter-date-end");
+  const dateRangeInput = document.getElementById("filter-date-range");
   const itemTypeSelect = document.getElementById("filter-item-type");
   const statusReturned = document.getElementById("status-returned");
   const statusPending = document.getElementById("status-pending");
@@ -24,7 +23,36 @@ document.addEventListener("DOMContentLoaded", () => {
   // Store fetched data here
   let allData = [];
 
-  // Listen for rows per page change to update pagination and re-render
+  // Date filters (strings in "YYYY-MM-DD" format)
+  let filterStartDate = "";
+  let filterEndDate = "";
+
+  // Helper function to format a Date object to "YYYY-MM-DD" in local time
+  function formatDateLocal(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  // Initialize flatpickr in range mode
+  flatpickr(dateRangeInput, {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    onChange: function (selectedDates) {
+      if (selectedDates.length === 2) {
+        filterStartDate = formatDateLocal(selectedDates[0]);
+        filterEndDate = formatDateLocal(selectedDates[1]);
+      } else {
+        filterStartDate = "";
+        filterEndDate = "";
+      }
+      currentPage = 1;
+      renderTable();
+    },
+  });
+
+  // Update rows per page and reset to first page
   rowsPerPageSelect.addEventListener("change", () => {
     rowsPerPage = parseInt(rowsPerPageSelect.value, 10);
     currentPage = 1; // reset page to first when page size changes
@@ -40,11 +68,15 @@ document.addEventListener("DOMContentLoaded", () => {
    */
   function filterData(data) {
     return data.filter((record) => {
-      if (startDateInput.value && record.date < startDateInput.value)
-        return false;
-      if (endDateInput.value && record.date > endDateInput.value) return false;
+      // Extract the date part "YYYY-MM-DD" from the record's date string
+      const recordDateStr = record.date.slice(0, 10);
+
+      if (filterStartDate && recordDateStr < filterStartDate) return false;
+      if (filterEndDate && recordDateStr > filterEndDate) return false;
+
       if (itemTypeSelect.value && record.itemName !== itemTypeSelect.value)
         return false;
+
       if (!statusReturned.checked && record.status === "Returned") return false;
       if (!statusPending.checked && record.status === "Pending") return false;
       if (!statusOverdue.checked && record.status === "Overdue") return false;
@@ -66,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
       let valA = a[sortField] || "";
       let valB = b[sortField] || "";
 
-      // Handle date sorting
+      // For date fields, parse into Date objects
       if (sortField === "date" || sortField === "returnDate") {
         valA = valA ? new Date(valA) : new Date(0);
         valB = valB ? new Date(valB) : new Date(0);
@@ -86,8 +118,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(".table-wrapper").classList.add("loading");
 
     setTimeout(() => {
-      let filteredData = filterData(allData);
-      let sortedData = sortData(filteredData);
+      const filteredData = filterData(allData);
+      const sortedData = sortData(filteredData);
 
       const start = (currentPage - 1) * rowsPerPage;
       const end = start + rowsPerPage;
@@ -196,10 +228,8 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // Listen for filter changes
+  // Listen for filter changes to re-render table and reset page to 1
   [
-    startDateInput,
-    endDateInput,
     itemTypeSelect,
     statusReturned,
     statusPending,
@@ -220,12 +250,12 @@ document.addEventListener("DOMContentLoaded", () => {
     th.addEventListener("click", () => {
       const field = th.getAttribute("data-sort");
 
-      // Toggle sort direction
+      // Toggle sort direction if same field, else set ascending
       sortDirection =
         sortField === field && sortDirection === "asc" ? "desc" : "asc";
       sortField = field;
 
-      // Update header icons
+      // Update active sort icons
       headers.forEach((el) => {
         el.classList.remove("active-sort");
         const icon = el.querySelector("i");
@@ -242,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Set default sorted column
+  // Set default sorted column icon
   const defaultHeader = document.querySelector(
     `#equipment-table thead th[data-sort="${sortField}"]`
   );
@@ -252,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (icon) icon.className = "bi bi-arrow-up";
   }
 
-  // Initial fetch and render
+  // Fetch data and render table initially
   fetchData()
     .then((data) => {
       allData = data;
